@@ -1,27 +1,24 @@
 package com.eltornillofeliz.backend.security.jwt;
 
-import com.eltornillofeliz.backend.security.user.User;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import java.security.Key;
 import java.util.Date;
 
-@Service
-@RequiredArgsConstructor
+import com.eltornillofeliz.backend.security.user.User;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+
 public class JwtService {
 
-    @Value("${jwt.secret}")
-    private String secretKey;
+    private final String secretKey;
+    private final long expiration;
 
-    @Value("${jwt.expiration}")
-    private long expiration;
-
-    private final PasswordEncoder passwordEncoder;
+    public JwtService(String secretKey, long expiration) {
+        this.secretKey = secretKey;
+        this.expiration = expiration;
+    }
 
     public String generateToken(User user) {
         return Jwts.builder()
@@ -40,10 +37,6 @@ public class JwtService {
     public boolean isTokenValid(String token, User user) {
         final String username = extractUsername(token);
         return (username.equals(user.getUsername()) && !isTokenExpired(token));
-    }
-
-    public boolean passwordMatches(String rawPassword, String hashedPassword) {
-        return passwordEncoder.matches(rawPassword, hashedPassword);
     }
 
     private Claims getClaims(String token) {
