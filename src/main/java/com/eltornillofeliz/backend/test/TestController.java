@@ -16,3 +16,4 @@ public class TestController {
     public ResponseEntity<String> privado() {
         return ResponseEntity.ok("🔐 Acceso autorizado ✅");
     }
+}
